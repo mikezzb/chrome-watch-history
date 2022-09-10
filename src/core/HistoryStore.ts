@@ -18,11 +18,11 @@ export default class HistoryStore extends StoreManager {
     let idx = this.findItemIndex(url);
     item ??= { url };
     if (idx === null) {
-      idx = this.initItem(url, item);
+      idx = this.initItem(item);
     }
     return idx;
   }
-  initItem(url: string, item: VideoHistoryItemBase) {
+  initItem(item: VideoHistoryItemBase) {
     this.videoHistory.push(item);
     this.length += 1;
     return this.length;

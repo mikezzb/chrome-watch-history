@@ -1,11 +1,14 @@
 import HistoryStore from "./HistoryStore";
+import { debounce } from "lodash";
 
 export class VideoManager {
   private itemIndex: number = -1;
   private store: HistoryStore = null as any;
   private _video: HTMLVideoElement | undefined = undefined;
+  private onTimeUpdate = debounce(this._onTimeUpdate, 5000);
   constructor(store: HistoryStore) {
     this.store = store;
+    this.onTimeUpdate = this.onTimeUpdate.bind(this);
   }
   private static validVideo(el: HTMLVideoElement) {
     return !!(
@@ -27,10 +30,22 @@ export class VideoManager {
     }
   }
   switchVideo(url: string) {
-    this._video = undefined;
-    if (this.video) {
-      this.itemIndex = this.store.addItem(url);
-    }
+    this.clear();
+    if (!this.video) return;
+    this.itemIndex = this.store.addItem(url);
     // eventlistener for playback and update item history
+    this.observeVideo();
+  }
+  _onTimeUpdate(event: Event) {
+    this.store.updateItem(this.itemIndex, {
+      currentTime: this.video?.currentTime,
+    });
+  }
+  observeVideo() {
+    this.video?.addEventListener("timeupdate", this.onTimeUpdate);
+  }
+  clear() {
+    this.video?.removeEventListener("timeupdate", this.onTimeUpdate);
+    this._video = undefined;
   }
 }
