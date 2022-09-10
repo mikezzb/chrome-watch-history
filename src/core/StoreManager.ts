@@ -22,6 +22,9 @@ export default class StoreManager {
   }
   async setStore(k: string, v: any) {
     this.updateStore(k, v);
+    await this.save(k, v);
+  }
+  async save(k: string, v: any) {
     await setItem(k, v);
   }
   async removeStore(k: string) {
