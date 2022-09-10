@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
 
-  "name": "My Chrome Extension",
-  "description": "Add your description here",
+  "name": "Chrome Video History",
+  "description": "Track your video playback history in Chrome",
   "version": "1.0",
 
   "options_ui": {
