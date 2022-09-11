@@ -1,5 +1,6 @@
 import React, { FC, MouseEventHandler } from "react";
 import clsx from "clsx";
+import styled from "styled-components";
 import Button from "./Button";
 
 type Action = {
@@ -13,16 +14,38 @@ type Prop = {
   action?: Action;
 };
 
+const Bar = styled.div`
+  position: fixed;
+  z-index: 2000;
+  bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+  right: 2.5%;
+  left: 2.5%;
+  align-items: center;
+  background-color: white;
+  padding: 12px;
+  border-radius: 4px;
+`;
+
+const SnackbarBtn = styled(Button)`
+  margin-left: 12px;
+`;
+
 const Snackbar: FC<Prop> = ({ className, message, action }) => {
   return (
-    <div className={clsx("cvh-snackbar", className)}>
+    <Bar className={clsx("cvh-snackbar", className)}>
       {message}
       {Boolean(action) && (
-        <Button className="cvh-snackbar-btn" onClick={action?.onClick as any}>
+        <SnackbarBtn
+          className="cvh-snackbar-btn"
+          onClick={action?.onClick as any}
+        >
           {action?.name}
-        </Button>
+        </SnackbarBtn>
       )}
-    </div>
+    </Bar>
   );
 };
 
