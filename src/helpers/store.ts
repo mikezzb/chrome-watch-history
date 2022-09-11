@@ -5,16 +5,20 @@ export const storeFactory = (
   mode: StorageArea
 ) => {
   const store = storage[mode];
-  const getItem = async (name: string | string[], parse = true) => {
+  const getItem = async (name: string) => {
     const value = await store.get(name);
-    return parse ? JSON.parse(value[name as string]) : value;
+    return value[name];
+  };
+  const getItems = async (name: string[]) => {
+    const values = await store.get(name);
+    return values;
   };
   const removeItem = async (name: string | string[]) => {
     await store.remove(name);
   };
-  const setItem = async (name: string, value: any, stringify = true) => {
+  const setItem = async (name: string, value: any) => {
     await store.set({
-      [name]: stringify ? JSON.stringify(value) : value,
+      [name]: value,
     });
   };
   const setItems = async (items: Record<string, any>) => {
@@ -22,15 +26,16 @@ export const storeFactory = (
   };
   return {
     getItem,
+    getItems,
     removeItem,
     setItem,
     setItems,
   };
 };
 
-const { getItem, setItem, removeItem, setItems } = storeFactory(
+const { getItem, setItem, removeItem, setItems, getItems } = storeFactory(
   chrome.storage,
   "local"
 );
 
-export { getItem, setItem, removeItem, setItems };
+export { getItem, setItem, removeItem, setItems, getItems };
