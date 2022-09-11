@@ -1,56 +1,44 @@
 import React, { FC, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import StoreProvider, { useHistory } from "./core";
+import { observer } from "mobx-react-lite";
 import { getCurrUrl } from "./helpers";
 
-const Popup: FC = () => {
-  const [count, setCount] = useState(0);
-  const [currentURL, setCurrentURL] = useState<string>();
+type VideoListItemProp = {
+  item: VideoHistoryItem;
+};
+
+const VideoListItem: FC<VideoListItemProp> = ({ item }) => {
+  return <div>{item.url}</div>;
+};
+
+const Popup: FC = observer(() => {
+  const history = useHistory();
 
   useEffect(() => {
-    chrome.action.setBadgeText({ text: count.toString() });
-  }, [count]);
-
-  useEffect(() => {
-    getCurrUrl().then((url) => setCurrentURL(url));
-  }, []);
-
-  const changeBackground = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const tab = tabs[0];
-      if (tab.id) {
-        chrome.tabs.sendMessage(
-          tab.id,
-          {
-            color: "#555555",
-          },
-          (msg) => {
-            console.log("result message:", msg);
-          }
-        );
-      }
-    });
-  };
+    console.log(history);
+  }, [history]);
 
   return (
     <>
-      <ul style={{ minWidth: "700px" }}>
-        <li>Current URL: {currentURL}</li>
-        <li>Current Time: {new Date().toLocaleTimeString()}</li>
-      </ul>
-      <button
-        onClick={() => setCount(count + 1)}
-        style={{ marginRight: "5px" }}
-      >
-        count up
-      </button>
-      <button onClick={changeBackground}>change background</button>
+      {history.videoHistory.map((item) => (
+        <VideoListItem key={`${item.url}-${item.src}`} item={item} />
+      ))}
     </>
+  );
+});
+
+const PopupContainer: FC = () => {
+  return (
+    <StoreProvider>
+      <Popup />
+    </StoreProvider>
   );
 };
 
 ReactDOM.render(
   <React.StrictMode>
-    <Popup />
+    <PopupContainer />
   </React.StrictMode>,
   document.getElementById("root")
 );
