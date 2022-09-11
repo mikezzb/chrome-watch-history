@@ -7,11 +7,16 @@ const LOAD_KEYS = ["videoHistory"];
 export default class HistoryStore extends StoreManager {
   videoHistory!: VideoHistoryItem[];
   length: number = 0;
+  currIndex: number = -1;
   constructor() {
     super(LOAD_KEYS, LOAD_KEYS);
     makeObservable(this, {
       length: observable,
+      currIndex: observable,
     });
+  }
+  get reversedHistory() {
+    return this.videoHistory.slice().reverse();
   }
   async init() {
     await this.loadStore();
@@ -39,6 +44,7 @@ export default class HistoryStore extends StoreManager {
     if (idx === null) {
       idx = this.initItem(item);
     }
+    this.currIndex = idx;
     return idx;
   }
   initItem(item: VideoHistoryItemBase) {

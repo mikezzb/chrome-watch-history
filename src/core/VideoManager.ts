@@ -1,6 +1,6 @@
 import HistoryStore from "./HistoryStore";
 import { throttle } from "lodash";
-import { SYNC_INTERVAL } from "../config";
+import { MIN_RECORD_DURATION, SYNC_INTERVAL } from "../config";
 
 // update store only ready
 
@@ -25,6 +25,13 @@ export class VideoManager {
   }
   private static validVideo(el: HTMLVideoElement) {
     return Boolean(el);
+  }
+  get validRecord() {
+    if (!this.video) return false;
+    return (
+      this.video.currentTime !== undefined &&
+      this.video.duration > MIN_RECORD_DURATION
+    );
   }
   get video(): HTMLVideoElement | null | undefined {
     if (this._video || this._video === null) return this._video;
@@ -75,7 +82,8 @@ export class VideoManager {
     this.observeVideo();
   }
   _onTimeUpdate(event: Event) {
-    if (this.video?.currentTime === undefined) return;
+    if (!this.validRecord) return;
+    // lazy append history only if valid record
     if (this.itemIndex === -1) {
       this.itemIndex = this.store.addItem(this.url as string);
     }
