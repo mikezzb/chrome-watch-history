@@ -1,5 +1,7 @@
 .cvh-list-item {
   justify-content: space-between;
+  height: 52px;
+  align-items: center;
 }
 
 .cvh-item-left {
@@ -20,7 +22,8 @@
 }
 
 .cvh-list-container {
-  overflow-y: scroll;
+  overflow: hidden;
+  margin: 12px;
 }
 
 .title,

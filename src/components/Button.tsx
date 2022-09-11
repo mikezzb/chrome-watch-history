@@ -7,6 +7,7 @@ const Button = styled.button`
   color: #0f0f0f;
   border-radius: 4px;
   padding: 4px 6px;
+  height: fit-content;
 `;
 
 export default Button;
