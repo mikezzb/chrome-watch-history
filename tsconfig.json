@@ -9,10 +9,6 @@
     "outDir": "dist/js",
     "noEmitOnError": true,
     "jsx": "react",
-    "typeRoots": ["node_modules/@types"],
-    "paths": {
-      "helpers/*": ["./src/helpers/*"],
-      "core/*": ["./src/app/core/*"]
-    }
+    "typeRoots": ["node_modules/@types"]
   }
 }
