@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { getCurrUrl } from "./helpers";
 
-const Popup = () => {
+const Popup: FC = () => {
   const [count, setCount] = useState(0);
   const [currentURL, setCurrentURL] = useState<string>();
 
@@ -10,9 +11,7 @@ const Popup = () => {
   }, [count]);
 
   useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      setCurrentURL(tabs[0].url);
-    });
+    getCurrUrl().then((url) => setCurrentURL(url));
   }, []);
 
   const changeBackground = () => {

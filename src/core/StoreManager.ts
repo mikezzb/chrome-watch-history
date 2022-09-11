@@ -1,4 +1,4 @@
-import { getItem, setItem, removeItem } from "../helpers/store";
+import { setItem, removeItem, getItems } from "../helpers/store";
 
 export default class StoreManager {
   onLoadKeys?: string[];
@@ -34,12 +34,8 @@ export default class StoreManager {
   async loadStore() {
     const defaultValues = { ...this.defaultValues };
     if (this.onLoadKeys) {
-      const loadedValues = await getItem(this.onLoadKeys);
+      const loadedValues = await getItems(this.onLoadKeys);
       Object.entries(loadedValues).forEach(([k, v]) => {
-        const parse = this.storageConfig[k] === undefined;
-        if (parse) {
-          v = JSON.parse(v as string);
-        }
         this.updateStore(k, v === null ? this.defaultValues[k] : v);
         delete defaultValues[k];
       });
