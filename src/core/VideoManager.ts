@@ -1,6 +1,12 @@
 import HistoryStore from "./HistoryStore";
 import { throttle } from "lodash";
-import { MIN_RECORD_DURATION, SYNC_INTERVAL } from "../config";
+import {
+  HISTORY_OVERWRITE_TIMEOUT,
+  MIN_RECORD_DURATION,
+  SYNC_INTERVAL,
+} from "../config";
+import { safeGetUrl } from "../helpers";
+import { historyStore } from ".";
 
 // update store only ready
 
@@ -12,6 +18,7 @@ export class VideoManager {
   private onTimeUpdate = throttle(this._onTimeUpdate, SYNC_INTERVAL);
   private url?: string;
   private source?: HTMLSourceElement;
+  private jumpTimeout?: NodeJS.Timeout; // allow time for user to jump b4 override hist if have prevItem
   constructor(store: HistoryStore) {
     this.store = store;
     this.onTimeUpdate = this.onTimeUpdate.bind(this);
@@ -21,7 +28,7 @@ export class VideoManager {
     await this.store.init();
     // for file:// videos, the DOM wont update, so call here after init
     this.initValues();
-    this.checkVideo(window.location.toString());
+    this.checkVideo(await safeGetUrl());
   }
   private static validVideo(el: HTMLVideoElement) {
     return Boolean(el);
@@ -82,16 +89,27 @@ export class VideoManager {
     this.observeVideo();
   }
   _onTimeUpdate(event: Event) {
-    if (!this.validRecord) return;
+    if (!this.validRecord || this.jumpTimeout) return;
     // lazy append history only if valid record
     if (this.itemIndex === -1) {
-      this.itemIndex = this.store.addItem(this.url as string);
+      const lazy = this.lazyMount();
+      if (lazy) return;
     }
     this.store.updateItem(this.itemIndex, {
       currentTime: this.video?.currentTime,
       duration: this.video?.duration,
       src: this.videoSrc,
     });
+  }
+  lazyMount() {
+    this.itemIndex = this.store.addItem(this.url as string);
+    if (!this.store.prevItem) return false;
+    console.log("set timeout then mount");
+    this.jumpTimeout = setTimeout(() => {
+      console.log("Jump interval passed, now overwriting");
+      this.jumpTimeout = undefined;
+    }, HISTORY_OVERWRITE_TIMEOUT);
+    return true;
   }
   observeVideo() {
     this.video?.addEventListener("timeupdate", this.onTimeUpdate);
@@ -107,5 +125,9 @@ export class VideoManager {
     if (skipVideo) return;
     this._video = undefined;
     this._videoSrc = "";
+    if (this.jumpTimeout) clearTimeout(this.jumpTimeout);
+    this.jumpTimeout = undefined;
   }
 }
+
+export const videoManager = new VideoManager(historyStore);
