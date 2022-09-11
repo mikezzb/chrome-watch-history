@@ -1,17 +1,12 @@
-import React, { FC, MouseEventHandler } from "react";
-import clsx from "clsx";
+import styled from "styled-components";
 
-type Prop = {
-  onClick: MouseEventHandler<HTMLButtonElement>;
-  className?: string;
-};
-
-const Button: FC<Prop> = ({ children, onClick, className }) => {
-  return (
-    <button className={clsx(className, "cvh-btn")} onClick={onClick}>
-      {children}
-    </button>
-  );
-};
+const Button = styled.button`
+  text-transform: capitalize;
+  background-color: transparent;
+  border: 1px solid #0f0f0f;
+  color: #0f0f0f;
+  border-radius: 4px;
+  padding: 4px 6px;
+`;
 
 export default Button;
