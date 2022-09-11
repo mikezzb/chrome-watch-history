@@ -1,4 +1,9 @@
 .cvh-list-item {
+  justify-content: space-between;
+}
+
+.cvh-item-left {
+  max-width: 300px;
 }
 
 .flex {
@@ -16,4 +21,15 @@
 
 .cvh-list-container {
   overflow-y: scroll;
+}
+
+.title,
+.caption,
+.ellipsis-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  margin-top: 5px;
 }
