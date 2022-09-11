@@ -2,14 +2,46 @@ import React, { FC, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import StoreProvider, { useHistory } from "./core";
 import { observer } from "mobx-react-lite";
-import { getCurrUrl } from "./helpers";
+import { getCurrUrl, toMMSS } from "./helpers";
+import clsx from "clsx";
 
 type VideoListItemProp = {
   item: VideoHistoryItem;
+  className?: string;
 };
 
-const VideoListItem: FC<VideoListItemProp> = ({ item }) => {
-  return <div>{item.url}</div>;
+const safeRun = (fn: Function, defaultReturn: any) => {
+  try {
+    return fn();
+  } catch (e) {
+    return defaultReturn;
+  }
+};
+
+const getLast = (arr: any[]) => arr[arr.length - 1];
+
+const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
+  const url = new URL(item.url);
+  const info: VideoHistoryItemInfo = { ...item } as any;
+  const shortDomain = url.hostname.split(".")[1] ?? "";
+  const videoName = item.src
+    ? decodeURI(getLast(item.src.split("/")).replace(/\.[^/.]+$/, ""))
+    : ""; // decode uri to show chinese char
+  info.title = `${shortDomain ? `${shortDomain}/` : ""}${videoName}`;
+  info.caption = `${toMMSS(item.currentTime)}`;
+  return info;
+};
+
+const VideoListItem: FC<VideoListItemProp> = ({ item, className }) => {
+  const info = derive(item);
+  return (
+    <div className={clsx("cvh-list-item", className)}>
+      <div className="cvh-item-left flex column">
+        <span className="title">{info.title}</span>
+        <span className="caption">{info.caption}</span>
+      </div>
+    </div>
+  );
 };
 
 const Popup: FC = observer(() => {
@@ -20,11 +52,14 @@ const Popup: FC = observer(() => {
   }, [history]);
 
   return (
-    <>
-      {history.videoHistory.map((item) => (
+    <div className="cvh-list-container flex column">
+      {Boolean(history.prevItem) && (
+        <VideoListItem className="active" item={history.prevItem as any} />
+      )}
+      {history.reversedHistory.map((item) => (
         <VideoListItem key={`${item.url}-${item.src}`} item={item} />
       ))}
-    </>
+    </div>
   );
 });
 
