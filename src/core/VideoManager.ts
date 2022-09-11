@@ -4,9 +4,10 @@ import { throttle } from "lodash";
 // update store only ready
 
 export class VideoManager {
-  private itemIndex: number = -1;
-  private store: HistoryStore = null as any;
-  private _video: HTMLVideoElement | undefined | null = undefined; // null: no video in dom
+  private itemIndex!: number;
+  private store!: HistoryStore;
+  private _video: HTMLVideoElement | undefined | null; // null: no video in dom
+  private _videoSrc!: string;
   private onTimeUpdate = throttle(this._onTimeUpdate, 1000);
   private url?: string;
   private source?: HTMLSourceElement;
@@ -18,20 +19,11 @@ export class VideoManager {
   async init() {
     await this.store.init();
     // for file:// videos, the DOM wont update, so call here after init
-    console.log();
+    this.initValues();
     this.checkVideo(window.location.toString());
   }
   private static validVideo(el: HTMLVideoElement) {
     return Boolean(el);
-  }
-  private static playingVideo(el: HTMLVideoElement) {
-    return Boolean(
-      !isNaN(el.duration) &&
-        el.currentTime > 0 &&
-        !el.paused &&
-        !el.ended &&
-        el.readyState > 2
-    );
   }
   get video(): HTMLVideoElement | null | undefined {
     if (this._video || this._video === null) return this._video;
@@ -57,7 +49,9 @@ export class VideoManager {
     return this._video;
   }
   get videoSrc(): string {
-    return this.video?.src || this.source?.src || "";
+    if (this._videoSrc) return this._videoSrc;
+    this._videoSrc = this.video?.src || this.source?.src || "";
+    return this._videoSrc;
   }
   checkVideo(url: string) {
     // if same url, then skip checking if got video already, otherwise keep checking
@@ -95,9 +89,14 @@ export class VideoManager {
   }
   clearVideo() {
     console.log("clearing");
-    this.itemIndex = -1;
-    if (!this.video) return;
+    if (!this.video) return this.initValues(true);
     this.video?.removeEventListener("timeupdate", this.onTimeUpdate);
+    this.initValues();
+  }
+  initValues(skipVideo = false) {
+    this.itemIndex = -1;
+    if (skipVideo) return;
     this._video = undefined;
+    this._videoSrc = "";
   }
 }
