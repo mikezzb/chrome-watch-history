@@ -1,3 +1,4 @@
+import { makeObservable, observable } from "mobx";
 import { MAX_RECORDS } from "../config";
 import StoreManager from "./StoreManager";
 
@@ -5,14 +6,17 @@ const LOAD_KEYS = ["videoHistory"];
 
 export default class HistoryStore extends StoreManager {
   videoHistory!: VideoHistoryItem[];
-  length!: number;
+  length: number = 0;
   constructor() {
     super(LOAD_KEYS, LOAD_KEYS);
-    this.init();
+    makeObservable(this, {
+      length: observable,
+    });
   }
   async init() {
     await this.loadStore();
     this.videoHistory ??= [];
+    observable.array(this.videoHistory, { deep: true });
     this.length = this.videoHistory.length;
     console.log(this.videoHistory);
   }
@@ -43,12 +47,10 @@ export default class HistoryStore extends StoreManager {
     return index;
   }
   saveHistory() {
-    console.log("saving");
     this.save("videoHistory", this.videoHistory);
   }
   updateItem(itemIndex: number, delta: Partial<VideoHistoryItem>) {
     console.log(`update ${itemIndex}: ${JSON.stringify(delta)}`);
-    console.log(this.videoHistory);
     Object.assign(this.videoHistory[itemIndex], delta);
     this.saveHistory();
   }
