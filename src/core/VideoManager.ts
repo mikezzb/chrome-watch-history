@@ -81,7 +81,9 @@ export class VideoManager {
   }
   _onTimeUpdate(event: Event) {
     if (this.video?.currentTime === undefined) return;
-    if (this.itemIndex === -1) this.store.addItem(this.url as string);
+    if (this.itemIndex === -1) {
+      this.itemIndex = this.store.addItem(this.url as string);
+    }
     this.store.updateItem(this.itemIndex, {
       currentTime: this.video?.currentTime,
       duration: this.video?.duration,
