@@ -10,3 +10,12 @@ export const toMMSS = (seconds: number) => {
   const sec = prefix(+(seconds % 60).toFixed(0));
   return `${min}:${sec}`;
 };
+
+const isPopup = (url: string) => url.startsWith("chrome-extension://");
+
+export const safeGetUrl = async () => {
+  let url = window.location.toString();
+  if (isPopup(url)) {
+    return await getCurrUrl();
+  } else return url;
+};
