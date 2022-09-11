@@ -4,18 +4,11 @@ import StoreProvider, { useHistory } from "./core";
 import { observer } from "mobx-react-lite";
 import { getCurrUrl, toMMSS } from "./helpers";
 import clsx from "clsx";
+import Button from "./components/Button";
 
 type VideoListItemProp = {
   item: VideoHistoryItem;
   className?: string;
-};
-
-const safeRun = (fn: Function, defaultReturn: any) => {
-  try {
-    return fn();
-  } catch (e) {
-    return defaultReturn;
-  }
 };
 
 const getLast = (arr: any[]) => arr[arr.length - 1];
@@ -32,13 +25,35 @@ const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
   return info;
 };
 
+const jumpToTime = (time: number) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id as any, {
+      type: "JUMP",
+      data: {
+        time,
+      },
+    });
+  });
+};
+
 const VideoListItem: FC<VideoListItemProp> = ({ item, className }) => {
   const info = derive(item);
+  const jumpToItem = () => {
+    chrome.tabs.update(
+      {
+        url: info.url,
+      },
+      () => jumpToTime(info.currentTime)
+    );
+  };
   return (
-    <div className={clsx("cvh-list-item", className)}>
+    <div className={clsx("cvh-list-item flex", className)}>
       <div className="cvh-item-left flex column">
-        <span className="title">{info.title}</span>
+        <span className="title ">{info.title}</span>
         <span className="caption">{info.caption}</span>
+      </div>
+      <div className="cvh-item-right flex">
+        <Button onClick={jumpToItem}>Jump</Button>
       </div>
     </div>
   );
@@ -48,8 +63,12 @@ const Popup: FC = observer(() => {
   const history = useHistory();
 
   useEffect(() => {
-    console.log(history);
-  }, [history]);
+    init();
+  }, []);
+
+  const init = async () => {
+    history.checkItem(await getCurrUrl());
+  };
 
   return (
     <div className="cvh-list-container flex column">
