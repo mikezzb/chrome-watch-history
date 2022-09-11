@@ -128,6 +128,10 @@ export class VideoManager {
     if (this.jumpTimeout) clearTimeout(this.jumpTimeout);
     this.jumpTimeout = undefined;
   }
+  jumpTo(time: number) {
+    if (!this.video) return;
+    this.video.currentTime = time;
+  }
 }
 
 export const videoManager = new VideoManager(historyStore);

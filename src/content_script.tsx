@@ -1,10 +1,11 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
+import { reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import Snackbar from "./components/Snackbar";
 import StoreProvider, { useHistory } from "./core";
 import { videoManager } from "./core/VideoManager";
-import { getCurrUrl, safeGetUrl, toMMSS } from "./helpers";
+import { safeGetUrl, toMMSS } from "./helpers";
 
 const domObserver = new MutationObserver((mutations) => {
   requestIdleCallback(
@@ -27,31 +28,40 @@ domObserver.observe(document, {
   subtree: true,
 });
 
-chrome.runtime.onMessage.addListener(
-  (request: CustomRequest, sender, sendResponse) => {
-    switch (request.type) {
-      case "JUMP":
-        const { time } = request.data;
-        videoManager.jumpTo(time);
-        break;
-    }
-  }
-);
-
 const JumpSnackbar: FC = observer(() => {
+  const [msg, setMsg] = useState<any>();
+  const prevItemRef = useRef<any>();
   const history = useHistory();
-  if (!history.prevItem) return null;
-  const msg = `Last watched ${toMMSS(history.prevItem.currentTime)}`;
-  return (
-    <Snackbar
-      message={msg}
-      action={{
-        name: "jump",
-        onClick: () =>
-          videoManager.jumpTo(history.prevItem?.currentTime as number),
-      }}
-    />
-  );
+  useEffect(() => {
+    const disposer = reaction(
+      () => ({
+        prevItem: history.prevItem,
+      }),
+      (data) => {
+        const { prevItem } = data;
+        if (prevItem && prevItem.src !== prevItemRef.current?.src) {
+          prevItemRef.current = prevItem;
+          setMsg({
+            message: `Last watched ${toMMSS(prevItem.currentTime)}`,
+            action: {
+              name: "jump",
+              onClick: () => {
+                videoManager.jumpTo(prevItem.currentTime as number);
+                setMsg(null);
+              },
+            },
+          });
+          setTimeout(() => {
+            setMsg(null);
+          }, 4000);
+        }
+      }
+    );
+    // end sync b4 unmount
+    return () => disposer();
+  }, []);
+  if (!msg) return null;
+  return <Snackbar message={msg.message} action={msg.action} />;
 });
 
 const App: FC = observer(() => {

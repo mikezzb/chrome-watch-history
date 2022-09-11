@@ -15,3 +15,10 @@ interface VideoHistoryItemInfo extends VideoHistoryItem {
   title: string;
   caption: string;
 }
+
+type MsgType = "JUMP";
+
+type CustomRequest = {
+  type: MsgType;
+  data: Record<string, any>;
+};

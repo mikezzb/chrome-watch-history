@@ -16,6 +16,7 @@ export default class HistoryStore extends StoreManager {
       currIndex: observable,
       prevItem: observable,
       checkItem: action,
+      addItem: action,
     });
   }
   get reversedHistory() {
