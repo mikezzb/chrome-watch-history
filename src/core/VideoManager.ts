@@ -1,50 +1,100 @@
 import HistoryStore from "./HistoryStore";
-import { debounce } from "lodash";
+import { throttle } from "lodash";
+
+// update store only ready
 
 export class VideoManager {
   private itemIndex: number = -1;
   private store: HistoryStore = null as any;
-  private _video: HTMLVideoElement | undefined = undefined;
-  private onTimeUpdate = debounce(this._onTimeUpdate, 5000);
+  private _video: HTMLVideoElement | undefined | null = undefined; // null: no video in dom
+  private onTimeUpdate = throttle(this._onTimeUpdate, 1000);
+  private url?: string;
+  private source?: HTMLSourceElement;
   constructor(store: HistoryStore) {
     this.store = store;
     this.onTimeUpdate = this.onTimeUpdate.bind(this);
+    this.init();
+  }
+  async init() {
+    await this.store.init();
+    // for file:// videos, the DOM wont update, so call here after init
+    console.log();
+    this.checkVideo(window.location.toString());
   }
   private static validVideo(el: HTMLVideoElement) {
-    return !!(
-      el &&
+    return Boolean(el);
+  }
+  private static playingVideo(el: HTMLVideoElement) {
+    return Boolean(
       !isNaN(el.duration) &&
-      el.currentTime > 0 &&
-      !el.paused &&
-      !el.ended &&
-      el.readyState > 2
+        el.currentTime > 0 &&
+        !el.paused &&
+        !el.ended &&
+        el.readyState > 2
     );
   }
-  get video(): HTMLVideoElement | undefined {
+  get video(): HTMLVideoElement | null | undefined {
     if (this._video || this._video === null) return this._video;
+    console.log("prev video:");
+    console.log(this._video);
+    console.log("checking for video");
     const videoNodes = document.getElementsByTagName("video");
+    console.log(videoNodes);
     for (let i = 0; i < videoNodes.length; i++) {
       const node = videoNodes[i];
-      this._video = node || null;
-      if (VideoManager.validVideo(node)) return this._video;
+      if (VideoManager.validVideo(node)) {
+        console.log("Found video node");
+        this._video = node;
+        const sources = node.getElementsByTagName("source");
+        this.source = sources ? sources[0] : undefined;
+        return this._video;
+      } else {
+        console.log("Invalid video node");
+      }
     }
+    console.log("Video node not found");
+    this._video = null;
+    return this._video;
   }
-  switchVideo(url: string) {
-    this.clear();
+  get videoSrc(): string {
+    return this.video?.src || this.source?.src || "";
+  }
+  checkVideo(url: string) {
+    // if same url, then skip checking if got video already, otherwise keep checking
+    if (url === this.url) {
+      if (this.video) return;
+      console.log("Same url check");
+    }
+    // if swapped url, then clear and check
+    else if (this.url !== undefined) {
+      this.clearVideo();
+      console.log("diff url check");
+    } else {
+      console.log(`Check init url: ${url}`);
+    }
+    this.url = url;
+    console.log("final:");
+    console.log(this.video);
     if (!this.video) return;
-    this.itemIndex = this.store.addItem(url);
     // eventlistener for playback and update item history
     this.observeVideo();
   }
   _onTimeUpdate(event: Event) {
+    if (this.video?.currentTime === undefined) return;
+    if (this.itemIndex === -1) this.store.addItem(this.url as string);
     this.store.updateItem(this.itemIndex, {
       currentTime: this.video?.currentTime,
+      duration: this.video?.duration,
+      src: this.videoSrc,
     });
   }
   observeVideo() {
     this.video?.addEventListener("timeupdate", this.onTimeUpdate);
   }
-  clear() {
+  clearVideo() {
+    console.log("clearing");
+    this.itemIndex = -1;
+    if (!this.video) return;
     this.video?.removeEventListener("timeupdate", this.onTimeUpdate);
     this._video = undefined;
   }
