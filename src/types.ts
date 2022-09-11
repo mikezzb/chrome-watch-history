@@ -6,4 +6,6 @@ interface VideoHistoryItemBase {
 /** Runtime attrs */
 interface VideoHistoryItem extends VideoHistoryItemBase {
   currentTime?: number;
+  duration?: number;
+  src?: string;
 }
