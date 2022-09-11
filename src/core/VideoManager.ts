@@ -1,5 +1,6 @@
 import HistoryStore from "./HistoryStore";
 import { throttle } from "lodash";
+import { SYNC_INTERVAL } from "../config";
 
 // update store only ready
 
@@ -8,7 +9,7 @@ export class VideoManager {
   private store!: HistoryStore;
   private _video: HTMLVideoElement | undefined | null; // null: no video in dom
   private _videoSrc!: string;
-  private onTimeUpdate = throttle(this._onTimeUpdate, 1000);
+  private onTimeUpdate = throttle(this._onTimeUpdate, SYNC_INTERVAL);
   private url?: string;
   private source?: HTMLSourceElement;
   constructor(store: HistoryStore) {
