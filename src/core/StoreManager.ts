@@ -1,3 +1,4 @@
+import { makeObservable, action } from "mobx";
 import { setItem, removeItem, getItems } from "../helpers/store";
 
 export default class StoreManager {
@@ -16,6 +17,15 @@ export default class StoreManager {
     this.onResetKeys = onResetKeys;
     this.defaultValues = defaultValues || {};
     this.storageConfig = storageConfig || {};
+    makeObservable(this, {
+      updateStore: action,
+      setStore: action,
+      save: action,
+      removeStore: action,
+      loadStore: action,
+      resetStore: action,
+      initStore: action,
+    });
   }
   updateStore(k: string, v: any) {
     (this as any)[k] = v;
