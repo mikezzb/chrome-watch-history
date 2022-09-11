@@ -39,22 +39,19 @@ const JumpSnackbar: FC = observer(() => {
       }),
       (data) => {
         const { prevItem } = data;
-        if (prevItem && prevItem.src !== prevItemRef.current?.src) {
-          prevItemRef.current = prevItem;
-          setMsg({
-            message: `Last watched ${toMMSS(prevItem.currentTime)}`,
-            action: {
-              name: "jump",
-              onClick: () => {
-                videoManager.jumpTo(prevItem.currentTime as number);
-                setMsg(null);
-              },
+        if (!prevItem || prevItem.src === prevItemRef.current?.src) return;
+        prevItemRef.current = prevItem;
+        setMsg({
+          message: `Last watched ${toMMSS(prevItem.currentTime)}`,
+          action: {
+            name: "jump",
+            onClick: () => {
+              videoManager.jumpTo(prevItem.currentTime as number);
+              setMsg(null);
             },
-          });
-          setTimeout(() => {
-            setMsg(null);
-          }, 4000);
-        }
+          },
+        });
+        setTimeout(() => setMsg(null), 4000);
       }
     );
     // end sync b4 unmount
