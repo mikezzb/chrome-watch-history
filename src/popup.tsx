@@ -25,26 +25,12 @@ const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
   return info;
 };
 
-const jumpToTime = (time: number) => {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome.tabs.sendMessage(tabs[0].id as any, {
-      type: "JUMP",
-      data: {
-        time,
-      },
-    });
-  });
-};
-
 const VideoListItem: FC<VideoListItemProp> = ({ item, className }) => {
   const info = derive(item);
   const jumpToItem = () => {
-    chrome.tabs.update(
-      {
-        url: info.url,
-      },
-      () => jumpToTime(info.currentTime)
-    );
+    chrome.tabs.update({
+      url: info.url,
+    });
   };
   return (
     <div className={clsx("cvh-list-item flex", className)}>
@@ -52,7 +38,7 @@ const VideoListItem: FC<VideoListItemProp> = ({ item, className }) => {
         <span className="title ">{info.title}</span>
         <span className="caption">{info.caption}</span>
       </div>
-      <div className="cvh-item-right flex">
+      <div className="cvh-item-right flex center">
         <Button onClick={jumpToItem}>Jump</Button>
       </div>
     </div>
