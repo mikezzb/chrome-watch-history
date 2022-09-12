@@ -5,18 +5,19 @@
 }
 
 .cvh-item-left {
-  max-width: 300px;
+  max-width: 240px;
+  width: 240px;
 }
 
-.flex {
+.cvh-flex {
   display: flex;
 }
 
-.column {
+.cvh-column {
   flex-direction: column;
 }
 
-.center {
+.cvh-center {
   align-items: center;
   justify-content: center;
 }
@@ -26,9 +27,9 @@
   margin: 12px;
 }
 
-.title,
-.caption,
-.ellipsis-text {
+.cvh-title,
+.cvh-caption,
+.cvh-ellipsis-text {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
