@@ -8,6 +8,7 @@ interface VideoHistoryItem extends VideoHistoryItemBase {
   currentTime: number;
   duration: number;
   src: string;
+  updatedAt: number;
 }
 
 /** Extended */
