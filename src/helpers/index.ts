@@ -11,6 +11,46 @@ export const toMMSS = (seconds: number) => {
   return `${min}:${sec}`;
 };
 
+export const download = (uri: string, filename?: string) => {
+  const link = document.createElement("a");
+  if (typeof link.download === "string") {
+    link.href = uri;
+    if (filename) {
+      link.download = filename;
+    }
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else {
+    window.open(uri);
+  }
+};
+
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+export const getMMMDDYY = (timestamp: string | number) => {
+  const currentYear = new Date().getFullYear();
+  const date = new Date(+timestamp);
+  const timestampYear = date.getFullYear();
+  const hideYear = currentYear === timestampYear;
+  return `${MONTHS[date.getMonth()]} ${date.getDate()}${
+    hideYear ? "" : `, ${date.getFullYear()}`
+  }`;
+};
+
 const isPopup = (url: string) => url.startsWith("chrome-extension://");
 
 export const safeGetUrl = async () => {
