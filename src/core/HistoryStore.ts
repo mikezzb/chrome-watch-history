@@ -1,11 +1,11 @@
-import { makeObservable, observable, action } from "mobx";
+import { makeObservable, observable, action, toJS, computed } from "mobx";
 import { MAX_RECORDS } from "../config";
 import StoreManager from "./StoreManager";
 
 const LOAD_KEYS = ["videoHistory"];
 
 export default class HistoryStore extends StoreManager {
-  videoHistory!: VideoHistoryItem[];
+  videoHistory: VideoHistoryItem[] = [];
   length: number = 0;
   currIndex: number = -1;
   prevItem?: VideoHistoryItem = undefined;
@@ -15,26 +15,27 @@ export default class HistoryStore extends StoreManager {
       length: observable,
       currIndex: observable,
       prevItem: observable,
+      videoHistory: observable,
+      reversedHistory: computed,
       checkItem: action,
       addItem: action,
+      deleteItem: action,
     });
-  }
-  get reversedHistory() {
-    console.log("getter called");
-    console.log(this.prevItem);
-    const arr = [...this.videoHistory];
-    if (this.prevItem && this.currIndex > -1) {
-      console.log("removing prev item");
-      arr.splice(this.currIndex, 1);
-    }
-    return arr.reverse();
   }
   async init() {
     await this.loadStore();
     this.videoHistory ??= [];
-    observable.array(this.videoHistory, { deep: true });
     this.length = this.videoHistory.length;
     console.log(this.videoHistory);
+  }
+  get reversedHistory() {
+    if (!this.videoHistory) return [];
+    const arr = this.videoHistory.slice();
+    // remove curr item from arr, cuz it's always on top
+    if (this.prevItem && this.currIndex > -1) {
+      arr.splice(this.currIndex, 1);
+    }
+    return arr.sort((a, b) => b.updatedAt - a.updatedAt);
   }
   shiftLength(delta: number) {
     let length = this.length + delta;
@@ -73,15 +74,25 @@ export default class HistoryStore extends StoreManager {
     this.currIndex = idx;
     return idx;
   }
+  deleteItem(url: string) {
+    const idx = this.findItemIndex(url);
+    if (idx === null) return;
+    const arr = [...this.videoHistory];
+    arr.splice(idx, 1);
+    this.videoHistory = arr;
+    this.shiftLength(-1);
+    this.saveHistory();
+  }
   initItem(item: VideoHistoryItemBase) {
     this.videoHistory.push(item as any);
     const index = this.shiftLength(1) - 1;
     return index;
   }
   saveHistory() {
-    this.save("videoHistory", this.videoHistory);
+    this.save("videoHistory", toJS(this.videoHistory));
   }
   updateItem(itemIndex: number, delta: Partial<VideoHistoryItem>) {
+    delta.updatedAt = +new Date();
     console.log(`update ${itemIndex}: ${JSON.stringify(delta)}`);
     Object.assign(this.videoHistory[itemIndex], delta);
     this.saveHistory();
