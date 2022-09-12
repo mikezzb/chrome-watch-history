@@ -26,7 +26,6 @@ export default class HistoryStore extends StoreManager {
     await this.loadStore();
     this.videoHistory ??= [];
     this.length = this.videoHistory.length;
-    console.log(this.videoHistory);
   }
   get reversedHistory() {
     if (!this.videoHistory) return [];

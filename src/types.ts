@@ -15,6 +15,7 @@ interface VideoHistoryItem extends VideoHistoryItemBase {
 interface VideoHistoryItemInfo extends VideoHistoryItem {
   title: string;
   caption: string;
+  name: string;
 }
 
 type MsgType = "JUMP";

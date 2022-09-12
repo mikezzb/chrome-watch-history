@@ -17,6 +17,7 @@ import IconButton from "./components/IconButton";
 type VideoListItemProp = {
   item: VideoHistoryItem;
   className?: string;
+  showDownload?: boolean;
   onDelete: (url: string) => any;
 };
 
@@ -26,10 +27,10 @@ const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
   const url = new URL(item.url);
   const info: VideoHistoryItemInfo = { ...item } as any;
   const shortDomain = url.hostname.split(".")[1] ?? "";
-  const videoName = item.src
+  info.name = item.src
     ? decodeURI(getLast(item.src.split("/")).replace(/\.[^/.]+$/, ""))
     : ""; // decode uri to show chinese char
-  info.title = `${shortDomain ? `${shortDomain}/` : ""}${videoName}`;
+  info.title = `${shortDomain ? `${shortDomain}/` : ""}${info.name}`;
   const progress = ((item.currentTime * 100) / item.duration).toFixed(0);
   info.caption = `${toMMSS(item.currentTime)} (${progress}%) • ${getMMMDDYY(
     item.updatedAt
@@ -40,6 +41,7 @@ const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
 const VideoListItem: FC<VideoListItemProp> = ({
   item,
   className,
+  showDownload,
   onDelete,
 }) => {
   const info = derive(item);
@@ -47,9 +49,6 @@ const VideoListItem: FC<VideoListItemProp> = ({
     chrome.tabs.create({
       url: info.url,
     });
-  };
-  const downloadItem = () => {
-    download(info.src);
   };
   return (
     <div className={clsx("cvh-list-item cvh-flex", className)}>
@@ -61,9 +60,18 @@ const VideoListItem: FC<VideoListItemProp> = ({
         <IconButton onClick={() => onDelete(item.url)}>
           <MdDeleteOutline />
         </IconButton>
-        <IconButton onClick={downloadItem}>
-          <MdOutlineFileDownload />
-        </IconButton>
+        {showDownload && (
+          <IconButton
+            onClick={() =>
+              chrome.downloads.download({
+                filename: info.name,
+                url: info.src,
+              })
+            }
+          >
+            <MdOutlineFileDownload />
+          </IconButton>
+        )}
         <IconButton onClick={jumpToItem}>
           <MdOpenInNew />
         </IconButton>
@@ -92,6 +100,7 @@ const Popup: FC = observer(() => {
           className="active"
           item={history.prevItem as any}
           onDelete={onDelete}
+          showDownload
         />
       )}
       {history.reversedHistory.map((item) => (

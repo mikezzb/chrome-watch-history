@@ -72,18 +72,15 @@ export class VideoManager {
     // if same url, then skip checking if got video already, otherwise keep checking
     if (url === this.url) {
       if (this.video) return;
-      console.log("Same url check");
     }
     // if swapped url, then clear and check
     else if (this.url !== undefined) {
       this.clearVideo();
-      console.log("diff url check");
+      // console.log("diff url check");
     } else {
-      console.log(`Check init url: ${url}`);
+      // console.log(`Check init url: ${url}`);
     }
     this.url = url;
-    console.log("final:");
-    console.log(this.video);
     if (!this.video) return;
     // eventlistener for playback and update item history
     this.observeVideo();
