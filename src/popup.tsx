@@ -2,13 +2,22 @@ import React, { FC, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import StoreProvider, { useHistory } from "./core";
 import { observer } from "mobx-react-lite";
-import { getCurrUrl, toMMSS } from "./helpers";
+import { download, getCurrUrl, getMMMDDYY, toMMSS } from "./helpers";
 import clsx from "clsx";
+import {
+  MdDeleteOutline,
+  MdDownload,
+  MdDownloadForOffline,
+  MdOpenInNew,
+  MdOutlineFileDownload,
+} from "react-icons/md";
 import Button from "./components/Button";
+import IconButton from "./components/IconButton";
 
 type VideoListItemProp = {
   item: VideoHistoryItem;
   className?: string;
+  onDelete: (url: string) => any;
 };
 
 const getLast = (arr: any[]) => arr[arr.length - 1];
@@ -21,25 +30,43 @@ const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
     ? decodeURI(getLast(item.src.split("/")).replace(/\.[^/.]+$/, ""))
     : ""; // decode uri to show chinese char
   info.title = `${shortDomain ? `${shortDomain}/` : ""}${videoName}`;
-  info.caption = `${toMMSS(item.currentTime)}`;
+  const progress = ((item.currentTime * 100) / item.duration).toFixed(0);
+  info.caption = `${toMMSS(item.currentTime)} (${progress}%) • ${getMMMDDYY(
+    item.updatedAt
+  )}`;
   return info;
 };
 
-const VideoListItem: FC<VideoListItemProp> = ({ item, className }) => {
+const VideoListItem: FC<VideoListItemProp> = ({
+  item,
+  className,
+  onDelete,
+}) => {
   const info = derive(item);
   const jumpToItem = () => {
-    chrome.tabs.update({
+    chrome.tabs.create({
       url: info.url,
     });
   };
+  const downloadItem = () => {
+    download(info.src);
+  };
   return (
-    <div className={clsx("cvh-list-item flex", className)}>
-      <div className="cvh-item-left flex column">
-        <span className="title ">{info.title}</span>
-        <span className="caption">{info.caption}</span>
+    <div className={clsx("cvh-list-item cvh-flex", className)}>
+      <div className="cvh-item-left cvh-flex cvh-column">
+        <span className="cvh-title ">{info.title}</span>
+        <span className="cvh-caption">{info.caption}</span>
       </div>
-      <div className="cvh-item-right flex center">
-        <Button onClick={jumpToItem}>Jump</Button>
+      <div className="cvh-item-right cvh-flex cvh-center">
+        <IconButton onClick={() => onDelete(item.url)}>
+          <MdDeleteOutline />
+        </IconButton>
+        <IconButton onClick={downloadItem}>
+          <MdOutlineFileDownload />
+        </IconButton>
+        <IconButton onClick={jumpToItem}>
+          <MdOpenInNew />
+        </IconButton>
       </div>
     </div>
   );
@@ -56,13 +83,23 @@ const Popup: FC = observer(() => {
     history.checkItem(await getCurrUrl());
   };
 
+  const onDelete = (url: string) => history.deleteItem(url);
+
   return (
-    <div className="cvh-list-container flex column">
+    <div className="cvh-list-container cvh-flex cvh-column">
       {Boolean(history.prevItem) && (
-        <VideoListItem className="active" item={history.prevItem as any} />
+        <VideoListItem
+          className="active"
+          item={history.prevItem as any}
+          onDelete={onDelete}
+        />
       )}
       {history.reversedHistory.map((item) => (
-        <VideoListItem key={`${item.url}-${item.src}`} item={item} />
+        <VideoListItem
+          key={`${item.url}-${item.src}`}
+          item={item}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   );
