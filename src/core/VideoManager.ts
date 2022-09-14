@@ -1,12 +1,8 @@
 import HistoryStore from "./HistoryStore";
-import { throttle } from "lodash";
-import {
-  HISTORY_OVERWRITE_TIMEOUT,
-  MIN_RECORD_DURATION,
-  SYNC_INTERVAL,
-} from "../config";
+import { DebouncedFunc, throttle } from "lodash";
 import { safeGetUrl } from "../helpers";
 import { historyStore } from ".";
+import ConfigStore, { configStore } from "./ConfigStore";
 
 // update store only ready
 
@@ -15,12 +11,15 @@ export class VideoManager {
   private store!: HistoryStore;
   private _video: HTMLVideoElement | undefined | null; // null: no video in dom
   private _videoSrc!: string;
-  private onTimeUpdate = throttle(this._onTimeUpdate, SYNC_INTERVAL);
+  private onTimeUpdate!: DebouncedFunc<any>;
   private url?: string;
   private source?: HTMLSourceElement;
   private jumpTimeout?: NodeJS.Timeout; // allow time for user to jump b4 override hist if have prevItem
-  constructor(store: HistoryStore) {
+  private config: ConfigStore;
+  constructor(store: HistoryStore, config: ConfigStore) {
     this.store = store;
+    this.config = config;
+    this.onTimeUpdate = throttle(this._onTimeUpdate, config.syncInterval);
     this.onTimeUpdate = this.onTimeUpdate.bind(this);
     this.init();
   }
@@ -37,7 +36,7 @@ export class VideoManager {
     if (!this.video) return false;
     return (
       this.video.currentTime !== undefined &&
-      this.video.duration > MIN_RECORD_DURATION
+      this.video.duration > this.config.recordThreshold
     );
   }
   get video(): HTMLVideoElement | null | undefined {
@@ -105,7 +104,7 @@ export class VideoManager {
     this.jumpTimeout = setTimeout(() => {
       console.log("Jump interval passed, now overwriting");
       this.jumpTimeout = undefined;
-    }, HISTORY_OVERWRITE_TIMEOUT);
+    }, this.config.overwriteTimeout);
     return true;
   }
   observeVideo() {
@@ -131,4 +130,4 @@ export class VideoManager {
   }
 }
 
-export const videoManager = new VideoManager(historyStore);
+export const videoManager = new VideoManager(historyStore, configStore);

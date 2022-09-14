@@ -1,5 +1,5 @@
 import { makeObservable, observable, action, toJS, computed } from "mobx";
-import { MAX_RECORDS } from "../config";
+import ConfigStore from "./ConfigStore";
 import StoreManager from "./StoreManager";
 
 const LOAD_KEYS = ["videoHistory"];
@@ -9,8 +9,10 @@ export default class HistoryStore extends StoreManager {
   length: number = 0;
   currIndex: number = -1;
   prevItem?: VideoHistoryItem = undefined;
-  constructor() {
+  private config: ConfigStore;
+  constructor(config: ConfigStore) {
     super(LOAD_KEYS, LOAD_KEYS);
+    this.config = config;
     makeObservable(this, {
       length: observable,
       currIndex: observable,
@@ -38,9 +40,9 @@ export default class HistoryStore extends StoreManager {
   }
   shiftLength(delta: number) {
     let length = this.length + delta;
-    if (length > MAX_RECORDS) {
+    if (length > this.config.maxRecords) {
       this.videoHistory.shift(); // remove oldest record (assume length delta <= 1)
-      length = MAX_RECORDS;
+      length = this.config.maxRecords;
     }
     this.length = length;
     return this.length;
