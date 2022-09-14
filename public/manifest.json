@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
 
-  "name": "Chrome Video History",
+  "name": "Chrome Watch History",
   "description": "Track your video playback history in Chrome",
   "version": "1.0",
 
   "options_ui": {
-    "page": "options.html"
+    "page": "options.html",
+    "open_in_tab": true
   },
 
   "action": {

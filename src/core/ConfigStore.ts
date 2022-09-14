@@ -9,9 +9,9 @@ const LOAD_KEYS = [
 ];
 
 const DEFAULT_VALUES = {
-  maxRecords: 15,
+  maxRecords: 30,
   syncInterval: 3000,
-  recordThreshold: 360, // in seconds = 6 mins, to ignore preview / commercial video
+  recordThreshold: 300, // in seconds = 5 mins, to ignore preview / commercial video
   overwriteTimeout: 10000,
 };
 
