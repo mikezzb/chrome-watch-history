@@ -1,76 +1,78 @@
-import React, { useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
+import React, {
+  ChangeEvent,
+  ChangeEventHandler,
+  FC,
+  useEffect,
+  useState,
+} from "react";
 import ReactDOM from "react-dom";
+import StoreProvider, { useConfig } from "./core";
 
-const Options = () => {
-  const [color, setColor] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
-  const [like, setLike] = useState<boolean>(false);
-
-  useEffect(() => {
-    // Restores select box and checkbox state using the preferences
-    // stored in chrome.storage.
-    chrome.storage.sync.get(
-      {
-        favoriteColor: "red",
-        likesColor: true,
-      },
-      (items) => {
-        setColor(items.favoriteColor);
-        setLike(items.likesColor);
-      }
-    );
-  }, []);
-
-  const saveOptions = () => {
-    // Saves options to chrome.storage.sync.
-    chrome.storage.sync.set(
-      {
-        favoriteColor: color,
-        likesColor: like,
-      },
-      () => {
-        // Update status to let user know options were saved.
-        setStatus("Options saved.");
-        const id = setTimeout(() => {
-          setStatus("");
-        }, 1000);
-        return () => clearTimeout(id);
-      }
-    );
-  };
-
+type SectionProps = {
+  title: string;
+};
+const Seciton: FC<SectionProps> = ({ title, children }) => {
   return (
-    <>
-      <div>
-        Favorite color: <select
-          value={color}
-          onChange={(event) => setColor(event.target.value)}
-        >
-          <option value="red">red</option>
-          <option value="green">green</option>
-          <option value="blue">blue</option>
-          <option value="yellow">yellow</option>
-        </select>
-      </div>
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={like}
-            onChange={(event) => setLike(event.target.checked)}
-          />
-          I like colors.
-        </label>
-      </div>
-      <div>{status}</div>
-      <button onClick={saveOptions}>Save</button>
-    </>
+    <div className="section cvh-column cvh-flex">
+      <h3 className="title section-title">{title}</h3>
+      {children}
+    </div>
   );
 };
 
+type FieldProps = {
+  label: string;
+  value: any;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+};
+
+const Field: FC<FieldProps> = ({ label, value, onChange }) => {
+  return (
+    <div className="field cvh-flex">
+      <span className="caption field-label">{label}</span>
+      <input className="field-input" value={value} onChange={onChange} />
+    </div>
+  );
+};
+
+const FIELDS = {
+  maxRecords: "Max records:",
+  syncInterval: "Sync interval (ms):",
+  recordThreshold: "Min video duration (s):",
+};
+
+const Options: FC = observer(() => {
+  const config = useConfig();
+  return (
+    <div className="container">
+      <h2 className="header">Chrome Watch History Options</h2>
+      <hr />
+      <Seciton title="Configs">
+        {Object.entries(FIELDS).map(([k, v]) => (
+          <Field
+            label={v}
+            key={k}
+            value={(config as any)[k]}
+            onChange={(e) => config.setStore(k, e.target.value)}
+          />
+        ))}
+      </Seciton>
+    </div>
+  );
+});
+
+const OptionsContainer: FC = observer(() => {
+  return (
+    <StoreProvider>
+      <Options />
+    </StoreProvider>
+  );
+});
+
 ReactDOM.render(
   <React.StrictMode>
-    <Options />
+    <OptionsContainer />
   </React.StrictMode>,
   document.getElementById("root")
 );

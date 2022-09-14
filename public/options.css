@@ -1,0 +1,14 @@
+.container {
+  padding: 16px;
+}
+
+.field {
+  height: 40px;
+  align-items: center;
+}
+
+.field-label {
+  font-size: 14px;
+  margin-right: 6px;
+  width: 150px;
+}
