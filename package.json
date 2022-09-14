@@ -1,11 +1,11 @@
 {
-  "name": "chrome-video-history",
+  "name": "chrome-watch-history",
   "version": "1.0.0",
-  "description": "chrome-video-history",
+  "description": "chrome-watch-history",
   "main": "index.js",
   "scripts": {
     "bootstrap": "sh bootstrap.sh",
-    "watch": "webpack --config webpack/webpack.dev.js --watch",
+    "dev": "webpack --config webpack/webpack.dev.js --watch",
     "build": "webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
     "test": "npx jest",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mikezzb/chrome-video-history.git"
+    "url": "https://github.com/mikezzb/chrome-watch-history.git"
   },
   "dependencies": {
     "clsx": "^1.2.1",
