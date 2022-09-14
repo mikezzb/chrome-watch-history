@@ -1,4 +1,5 @@
 import { makeObservable, observable, action, toJS, computed } from "mobx";
+import { getTitle } from "../helpers";
 import ConfigStore from "./ConfigStore";
 import StoreManager from "./StoreManager";
 
@@ -66,6 +67,7 @@ export default class HistoryStore extends StoreManager {
     let idx = this.findItemIndex(url);
     item ??= { url };
     if (idx === null) {
+      item.title = getTitle();
       idx = this.initItem(item);
     } else {
       // if has hist: make prev item for user to jump to prev playback time
@@ -75,7 +77,7 @@ export default class HistoryStore extends StoreManager {
     this.currIndex = idx;
     return idx;
   }
-  deleteItem(url: string) {
+  async deleteItem(url: string) {
     const idx = this.findItemIndex(url);
     if (idx === null) return;
     const arr = [...this.videoHistory];

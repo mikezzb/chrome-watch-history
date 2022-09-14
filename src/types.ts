@@ -1,6 +1,7 @@
 /** Initial hist item */
 interface VideoHistoryItemBase {
   url: string;
+  title?: string;
 }
 
 /** Runtime attrs */

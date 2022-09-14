@@ -1,5 +1,5 @@
 import { makeObservable, action } from "mobx";
-import { setItem, removeItem, getItems } from "../helpers/store";
+import { setItem, removeItem, getItems, getItem } from "../helpers/store";
 
 export default class StoreManager {
   onLoadKeys?: string[];
@@ -36,6 +36,9 @@ export default class StoreManager {
   }
   async save(k: string, v: any) {
     await setItem(k, v);
+  }
+  async loadItem(k: string) {
+    return await getItem(k);
   }
   async removeStore(k: string) {
     this.updateStore(k, undefined);
