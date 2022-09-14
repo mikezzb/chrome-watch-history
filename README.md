@@ -1,48 +1,27 @@
-# chrome-video-history
+# chrome-watch-history
 
-![build](https://github.com/mikezzb/chrome-video-history/workflows/build/badge.svg)
+![build](https://github.com/mikezzb/chrome-watch-history/workflows/build/badge.svg)
 
 ## Prerequisites
 
 - [node.js](https://nodejs.org/) + [yarn](https://yarnpkg.com/)
 
-## Project Structure
+## Scripts
 
-- src/typescript: TypeScript source files
-- src/assets: static files
-- dist: Chrome Extension directory
-- dist/js: Generated JavaScript files
-
-## Setup
+### Setup
 
 ```
 yarn install
 ```
 
-## Build
+### Build
 
 ```
 yarn build
 ```
 
-## Build in watch mode
-
-### terminal
+### Dev
 
 ```
-yarn watch
+yarn dev
 ```
-
-### Visual Studio Code
-
-Run watch mode.
-
-type `Ctrl + Shift + B`
-
-## Load extension to chrome
-
-Load `dist` directory
-
-## Test
-
-`npx jest` or `yarn test`
