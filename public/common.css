@@ -1,0 +1,23 @@
+.cvh-flex {
+  display: flex;
+}
+
+.cvh-column {
+  flex-direction: column;
+}
+
+.cvh-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.cvh-title,
+.cvh-caption,
+.cvh-ellipsis-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  margin-top: 5px;
+}

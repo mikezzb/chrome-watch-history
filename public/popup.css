@@ -1,3 +1,8 @@
+.cvh-list-container {
+  overflow: hidden;
+  margin: 12px;
+}
+
 .cvh-list-item {
   justify-content: space-between;
   height: 52px;
@@ -7,33 +12,4 @@
 .cvh-item-left {
   max-width: 240px;
   width: 240px;
-}
-
-.cvh-flex {
-  display: flex;
-}
-
-.cvh-column {
-  flex-direction: column;
-}
-
-.cvh-center {
-  align-items: center;
-  justify-content: center;
-}
-
-.cvh-list-container {
-  overflow: hidden;
-  margin: 12px;
-}
-
-.cvh-title,
-.cvh-caption,
-.cvh-ellipsis-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  margin-top: 5px;
 }
