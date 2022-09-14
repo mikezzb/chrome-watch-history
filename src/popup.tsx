@@ -27,14 +27,18 @@ const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
   const url = new URL(item.url);
   const info: VideoHistoryItemInfo = { ...item } as any;
   const shortDomain = url.hostname.split(".")[1] ?? "";
-  info.name = item.src
+  const name = item.src
     ? decodeURI(getLast(item.src.split("/")).replace(/\.[^/.]+$/, ""))
     : ""; // decode uri to show chinese char
-  info.title = `${shortDomain ? `${shortDomain}/` : ""}${info.name}`;
+  info.title ||= name || item.url;
   const progress = ((item.currentTime * 100) / item.duration).toFixed(0);
-  info.caption = `${toMMSS(item.currentTime)} (${progress}%) • ${getMMMDDYY(
-    item.updatedAt
-  )}`;
+  info.caption = [
+    `${toMMSS(item.currentTime)} (${progress}%)`,
+    getMMMDDYY(item.updatedAt),
+    shortDomain || "local",
+  ]
+    .filter((s) => s)
+    .join(" • ");
   return info;
 };
 
@@ -64,7 +68,7 @@ const VideoListItem: FC<VideoListItemProp> = ({
           <IconButton
             onClick={() =>
               chrome.downloads.download({
-                filename: info.name,
+                filename: info.title,
                 url: info.src,
               })
             }
