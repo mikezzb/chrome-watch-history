@@ -103,7 +103,7 @@ export default class HistoryStore extends StoreManager {
     await this.save("videoHistory", toJS(this.videoHistory));
   }
   updateItem(itemIndex: number, delta: Partial<VideoHistoryItem>) {
-    if (itemIndex === -1) return;
+    if (itemIndex === -1 || !this.videoHistory[itemIndex]) return;
     delta.updatedAt = +new Date();
     console.log(`update ${itemIndex}: ${JSON.stringify(delta)}`);
     Object.assign(this.videoHistory[itemIndex], delta);

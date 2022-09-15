@@ -14,12 +14,6 @@ import Button from "./components/Button";
 import IconButton from "./components/IconButton";
 import { broadcastAll } from "./helpers/message";
 
-type VideoListItemProp = {
-  item: VideoHistoryItem;
-  className?: string;
-  onDelete: (url: string) => any;
-};
-
 const getLast = (arr: any[]) => arr[arr.length - 1];
 
 const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
@@ -41,6 +35,12 @@ const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
   return info;
 };
 
+type VideoListItemProp = {
+  item: VideoHistoryItem;
+  className?: string;
+  onDelete?: (url: string) => any;
+};
+
 const VideoListItem: FC<VideoListItemProp> = ({
   item,
   className,
@@ -59,9 +59,11 @@ const VideoListItem: FC<VideoListItemProp> = ({
         <span className="cvh-caption">{info.caption}</span>
       </div>
       <div className="cvh-item-right cvh-flex cvh-center">
-        <IconButton onClick={() => onDelete(item.url)}>
-          <MdDeleteOutline />
-        </IconButton>
+        {Boolean(onDelete) && (
+          <IconButton onClick={() => (onDelete as any)(item.url)}>
+            <MdDeleteOutline />
+          </IconButton>
+        )}
         <IconButton onClick={jumpToItem}>
           <MdOpenInNew />
         </IconButton>
@@ -72,6 +74,7 @@ const VideoListItem: FC<VideoListItemProp> = ({
 
 const Popup: FC = observer(() => {
   const history = useHistory();
+  const [hideId, setHideId] = useState<string | null>();
 
   useEffect(() => {
     init();
@@ -83,6 +86,7 @@ const Popup: FC = observer(() => {
 
   const onDelete = async (url: string) => {
     // pause update -> delete -> sync content script history
+    setHideId(url);
     await broadcastAll({
       type: "PAUSE",
     });
@@ -91,18 +95,18 @@ const Popup: FC = observer(() => {
     await broadcastAll({
       type: "SYNC",
     });
+    setHideId(null);
   };
 
   return (
     <div className="cvh-list-container cvh-flex cvh-column">
       {Boolean(history.prevItem) && (
-        <VideoListItem
-          className="active"
-          item={history.prevItem as any}
-          onDelete={onDelete}
-        />
+        <VideoListItem className="active" item={history.prevItem as any} />
       )}
-      {history.reversedHistory.map((item) => (
+      {(hideId
+        ? history.reversedHistory.filter((item) => item.url !== hideId)
+        : history.reversedHistory
+      ).map((item) => (
         <VideoListItem
           key={`${item.url}-${item.src}`}
           item={item}
