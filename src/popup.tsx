@@ -2,14 +2,13 @@ import React, { FC, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import StoreProvider, { useHistory } from "./core";
 import { observer } from "mobx-react-lite";
-import { download, getCurrUrl, getMMMDDYY, toMMSS } from "./helpers";
+import { getCurrUrl, getMMMDDYY, toMMSS } from "./helpers";
 import clsx from "clsx";
 import {
   MdDeleteOutline,
   MdDownload,
   MdDownloadForOffline,
   MdOpenInNew,
-  MdOutlineFileDownload,
 } from "react-icons/md";
 import Button from "./components/Button";
 import IconButton from "./components/IconButton";
@@ -18,7 +17,6 @@ import { broadcastAll } from "./helpers/message";
 type VideoListItemProp = {
   item: VideoHistoryItem;
   className?: string;
-  showDownload?: boolean;
   onDelete: (url: string) => any;
 };
 
@@ -46,7 +44,6 @@ const derive = (item: VideoHistoryItem): VideoHistoryItemInfo => {
 const VideoListItem: FC<VideoListItemProp> = ({
   item,
   className,
-  showDownload,
   onDelete,
 }) => {
   const info = derive(item);
@@ -65,18 +62,6 @@ const VideoListItem: FC<VideoListItemProp> = ({
         <IconButton onClick={() => onDelete(item.url)}>
           <MdDeleteOutline />
         </IconButton>
-        {showDownload && (
-          <IconButton
-            onClick={() =>
-              chrome.downloads.download({
-                filename: info.title,
-                url: info.src,
-              })
-            }
-          >
-            <MdOutlineFileDownload />
-          </IconButton>
-        )}
         <IconButton onClick={jumpToItem}>
           <MdOpenInNew />
         </IconButton>
@@ -115,7 +100,6 @@ const Popup: FC = observer(() => {
           className="active"
           item={history.prevItem as any}
           onDelete={onDelete}
-          showDownload
         />
       )}
       {history.reversedHistory.map((item) => (

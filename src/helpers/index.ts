@@ -13,21 +13,6 @@ export const toMMSS = (seconds: number) => {
   return `${min}:${sec}`;
 };
 
-export const download = (uri: string, filename?: string) => {
-  const link = document.createElement("a");
-  if (typeof link.download === "string") {
-    link.href = uri;
-    if (filename) {
-      link.download = filename;
-    }
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } else {
-    window.open(uri);
-  }
-};
-
 const MONTHS = [
   "Jan",
   "Feb",
