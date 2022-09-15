@@ -73,7 +73,10 @@ const JumpSnackbar: FC = observer(() => {
             },
           },
         });
-        setTimeout(() => setMsg(null), 4000);
+        setTimeout(() => setMsg(null), 400000);
+      },
+      {
+        fireImmediately: true,
       }
     );
     // end sync b4 unmount
@@ -95,6 +98,8 @@ const inject = () => {
   const body = document.querySelector("body");
   const app = document.createElement("div");
   app.id = "cvh-root";
+  app.style.fontFamily = `-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif`;
   if (body) {
     body.prepend(app);
     ReactDOM.render(
