@@ -10,10 +10,10 @@ import { getWindowUrl, safeGetUrl, toMMSS } from "./helpers";
 /** Monitor dom update & find video node */
 const domObserver = new MutationObserver((mutations) => {
   requestIdleCallback(
-    async () => {
+    () => {
       mutations.forEach(async (mutation) => {
         if (mutation.type === "childList") {
-          videoManager.checkVideo(await safeGetUrl());
+          videoManager.checkVideo(getWindowUrl());
         }
       });
     },
@@ -27,6 +27,16 @@ domObserver.observe(document, {
   attributeFilter: ["aria-hidden"],
   childList: true,
   subtree: true,
+});
+
+/** Sync history array when have focus */
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "visible") {
+    console.log("has focus");
+    videoManager.sync();
+  } else {
+    console.log("lost focus");
+  }
 });
 
 /** Monitor popup events */
@@ -101,6 +111,7 @@ const inject = () => {
   app.style.fontFamily = `-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif`;
   if (body) {
+    videoManager.checkVideo(getWindowUrl());
     body.prepend(app);
     ReactDOM.render(
       <React.StrictMode>
