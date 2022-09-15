@@ -32,10 +32,7 @@ domObserver.observe(document, {
 /** Sync history array when have focus */
 document.addEventListener("visibilitychange", function () {
   if (document.visibilityState === "visible") {
-    console.log("has focus");
     videoManager.sync();
-  } else {
-    console.log("lost focus");
   }
 });
 

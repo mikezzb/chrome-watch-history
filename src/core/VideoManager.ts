@@ -47,24 +47,16 @@ export class VideoManager {
   }
   get video(): HTMLVideoElement | null | undefined {
     if (this._video || this._video === null) return this._video;
-    console.log("prev video:");
-    console.log(this._video);
-    console.log(`checking for video ${this.url}`);
     const videoNodes = document.getElementsByTagName("video");
-    console.log(videoNodes);
     for (let i = 0; i < videoNodes.length; i++) {
       const node = videoNodes[i];
       if (VideoManager.validVideo(node)) {
-        console.log("Found video node");
         this._video = node;
         const sources = node.getElementsByTagName("source");
         this.source = sources ? sources[0] : undefined;
         return this._video;
-      } else {
-        console.log("Invalid video node");
       }
     }
-    console.log("Video node not found");
     this._video = null;
     return this._video;
   }
@@ -112,9 +104,7 @@ export class VideoManager {
     await this.store.init();
     this.itemIndex = this.store.addItem(this.url as string);
     if (!this.store.prevItem) return false;
-    console.log("set timeout then mount");
     this.jumpTimeout = setTimeout(() => {
-      console.log("Jump interval passed, now overwriting");
       this.jumpTimeout = undefined;
     }, this.config.overwriteTimeout);
     return true;
@@ -123,7 +113,6 @@ export class VideoManager {
     this.video?.addEventListener("timeupdate", this.onTimeUpdate);
   }
   clearVideo() {
-    console.log("clearing");
     if (!this.video) return this.initValues(true);
     this.video?.removeEventListener("timeupdate", this.onTimeUpdate);
     this.initValues();
@@ -141,22 +130,15 @@ export class VideoManager {
     this.video.currentTime = time;
   }
   pause() {
-    console.log("pause");
     this.state = VideoManagerState.PAUSE;
   }
   resume() {
-    console.log("resume");
     this.state = VideoManagerState.READY;
   }
   async sync() {
-    console.log(`Sync: ${this.itemIndex}`);
     this.pause();
-    console.log(this.store.videoHistory);
     await this.store.init();
     this.itemIndex = this.store.addItem(this.url as string); // reassign index
-    console.log(`After sync: ${this.itemIndex}`);
-    console.log(this.store.videoHistory);
-    console.log(this.itemIndex);
     this.resume();
   }
 }

@@ -29,7 +29,6 @@ export default class HistoryStore extends StoreManager {
   async init() {
     await this.loadStore();
     this.videoHistory ??= [];
-    this.prevItem = undefined;
     this.length = this.videoHistory.length;
   }
   get showPrevRecord() {
@@ -81,7 +80,6 @@ export default class HistoryStore extends StoreManager {
     } else {
       // if has hist: make prev item for user to jump to prev playback time
       this.prevItem = this.videoHistory[idx];
-      console.log("prev record: ", JSON.stringify(this.prevItem));
     }
     this.setCurrItem(idx, url);
     return idx;
@@ -106,7 +104,6 @@ export default class HistoryStore extends StoreManager {
   updateItem(itemIndex: number, delta: Partial<VideoHistoryItem>) {
     if (itemIndex === -1 || !this.videoHistory[itemIndex]) return;
     delta.updatedAt = +new Date();
-    console.log(`update ${itemIndex}: ${JSON.stringify(delta)}`);
     Object.assign(this.videoHistory[itemIndex], delta);
     this.saveHistory();
   }

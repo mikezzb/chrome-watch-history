@@ -8,8 +8,6 @@ export const broadcastAll = (
   return new Promise((resolve, reject) => {
     try {
       chrome.tabs.query({}, (tabs) => {
-        console.log("Tabs:");
-        console.log(tabs);
         /* return Promise.all(
           tabs.map((tab) => broadcast(tab.id as number, msg, callback))
         ); */
