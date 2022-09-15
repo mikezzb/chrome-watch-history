@@ -29,6 +29,7 @@ export default class HistoryStore extends StoreManager {
   async init() {
     await this.loadStore();
     this.videoHistory ??= [];
+    this.prevItem = undefined;
     this.length = this.videoHistory.length;
   }
   get showPrevRecord() {

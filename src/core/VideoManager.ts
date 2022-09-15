@@ -49,7 +49,7 @@ export class VideoManager {
     if (this._video || this._video === null) return this._video;
     console.log("prev video:");
     console.log(this._video);
-    console.log("checking for video");
+    console.log(`checking for video ${this.url}`);
     const videoNodes = document.getElementsByTagName("video");
     console.log(videoNodes);
     for (let i = 0; i < videoNodes.length; i++) {
@@ -77,22 +77,20 @@ export class VideoManager {
     // if same url, then skip checking if got video already, otherwise keep checking
     if (url === this.url) {
       if (this.video) return;
-      console.log("same url check");
     }
     // if swapped url, then clear and check
     else if (this.url !== undefined) {
       this.clearVideo();
-      console.log("diff url check");
+      this.url = url;
     } else {
-      console.log(`Check init url: ${url}`);
+      this._video = undefined;
+      this.url = url;
     }
-    this.url = url;
     if (!this.video) return;
     // eventlistener for playback and update item history
     this.observeVideo();
   }
-  _onTimeUpdate(event: Event) {
-    console.log(this.state);
+  async _onTimeUpdate(event: Event) {
     if (
       !this.validRecord ||
       this.jumpTimeout ||
@@ -101,7 +99,7 @@ export class VideoManager {
       return;
     // lazy append history only if valid record
     if (this.itemIndex === -1) {
-      const lazy = this.lazyMount();
+      const lazy = await this.lazyMount();
       if (lazy) return;
     }
     this.store.updateItem(this.itemIndex, {
@@ -110,7 +108,8 @@ export class VideoManager {
       src: this.videoSrc,
     });
   }
-  lazyMount() {
+  async lazyMount() {
+    await this.store.init();
     this.itemIndex = this.store.addItem(this.url as string);
     if (!this.store.prevItem) return false;
     console.log("set timeout then mount");
@@ -131,8 +130,8 @@ export class VideoManager {
   }
   initValues(skipVideo = false) {
     this.itemIndex = -1;
-    if (skipVideo) return;
     this._video = undefined;
+    if (skipVideo) return;
     this._videoSrc = "";
     if (this.jumpTimeout) clearTimeout(this.jumpTimeout);
     this.jumpTimeout = undefined;
