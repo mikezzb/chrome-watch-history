@@ -5,7 +5,7 @@ import { observer } from "mobx-react-lite";
 import Snackbar from "./components/Snackbar";
 import StoreProvider, { useHistory } from "./core";
 import { videoManager } from "./core/VideoManager";
-import { getWindowUrl, safeGetUrl, toMMSS } from "./helpers";
+import { getWindowUrl, toMMSS } from "./helpers";
 
 /** Monitor dom update & find video node */
 const domObserver = new MutationObserver((mutations) => {
@@ -40,15 +40,17 @@ document.addEventListener("visibilitychange", function () {
 chrome.runtime.onMessage.addListener(
   (request: CustomRequest, sender, sendResponse) => {
     switch (request.type) {
-      case "JUMP":
+      case "JUMP": {
         const { time } = request.data;
         videoManager.jumpTo(time);
         break;
-      case "SYNC":
+      }
+      case "SYNC": {
         const { url } = request.data || {};
         if (url && getWindowUrl() !== url) return; // if url dun match, skip sync
         videoManager.sync();
         break;
+      }
       case "PAUSE":
         videoManager.pause();
         break;

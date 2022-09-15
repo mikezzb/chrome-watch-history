@@ -1,4 +1,4 @@
-import { makeObservable, observable, action, toJS, computed } from "mobx";
+import { makeObservable, observable, action, toJS } from "mobx";
 import { getTitle } from "../helpers";
 import ConfigStore from "./ConfigStore";
 import StoreManager from "./StoreManager";
@@ -7,9 +7,9 @@ const LOAD_KEYS = ["videoHistory"];
 
 export default class HistoryStore extends StoreManager {
   videoHistory: VideoHistoryItem[] = [];
-  length: number = 0;
-  currIndex: number = -1;
-  currUrl: string = "";
+  length = 0;
+  currIndex = -1;
+  currUrl = "";
   prevItem?: VideoHistoryItem = undefined;
   private config: ConfigStore;
   constructor(config: ConfigStore) {
@@ -65,7 +65,7 @@ export default class HistoryStore extends StoreManager {
    * @param url
    */
   checkItem(url: string) {
-    let idx = this.findItemIndex(url);
+    const idx = this.findItemIndex(url);
     if (idx !== null) {
       this.prevItem = this.videoHistory[idx];
       this.setCurrItem(idx, url);

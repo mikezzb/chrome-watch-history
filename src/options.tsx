@@ -1,10 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, {
-  ChangeEvent,
   ChangeEventHandler,
   FC,
-  useEffect,
-  useState,
 } from "react";
 import ReactDOM from "react-dom";
 import StoreProvider, { useConfig } from "./core";

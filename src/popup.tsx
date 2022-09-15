@@ -6,11 +6,8 @@ import { getCurrUrl, getMMMDDYY, toMMSS } from "./helpers";
 import clsx from "clsx";
 import {
   MdDeleteOutline,
-  MdDownload,
-  MdDownloadForOffline,
   MdOpenInNew,
 } from "react-icons/md";
-import Button from "./components/Button";
 import IconButton from "./components/IconButton";
 import { broadcastAll } from "./helpers/message";
 
