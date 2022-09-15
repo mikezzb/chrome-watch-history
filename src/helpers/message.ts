@@ -1,26 +1,37 @@
 type ResponseCallback = (response: any) => void;
 
-export const broadcastAll = async (
+export const broadcastAll = (
   msg: Record<string, any>,
   filterFn?: (tab: any) => boolean,
   callback?: ResponseCallback
 ) => {
-  console.log("BC All");
-  const tabs = await chrome.tabs.query({});
-  console.log("Tabs:");
-  console.log(tabs);
-  /* return Promise.all(
-    tabs.map((tab) => broadcast(tab.id as number, msg, callback))
-  ); */
-  (filterFn ? tabs.filter(filterFn) : tabs).forEach((tab) =>
-    broadcast(tab.id as number, msg, callback)
-  );
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.tabs.query({}, (tabs) => {
+        console.log("Tabs:");
+        console.log(tabs);
+        /* return Promise.all(
+          tabs.map((tab) => broadcast(tab.id as number, msg, callback))
+        ); */
+        (filterFn ? tabs.filter(filterFn) : tabs).forEach((tab) =>
+          broadcast(tab.id as number, msg, callback)
+        );
+        resolve(undefined);
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
 };
 
-export const broadcast = async (
+export const broadcast = (
   tabId: number,
   msg: Record<string, any>,
   callback?: ResponseCallback
 ) => {
-  chrome.tabs.sendMessage(tabId, msg, callback);
+  try {
+    chrome.tabs.sendMessage(tabId, msg, callback);
+  } catch (e) {
+    return;
+  }
 };
