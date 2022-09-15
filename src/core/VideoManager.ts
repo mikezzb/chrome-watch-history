@@ -150,11 +150,12 @@ export class VideoManager {
     this.state = VideoManagerState.READY;
   }
   async sync() {
-    console.log("sync");
+    console.log(`Sync: ${this.itemIndex}`);
     this.pause();
     console.log(this.store.videoHistory);
     await this.store.init();
     this.itemIndex = this.store.addItem(this.url as string); // reassign index
+    console.log(`After sync: ${this.itemIndex}`);
     console.log(this.store.videoHistory);
     console.log(this.itemIndex);
     this.resume();

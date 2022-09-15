@@ -20,7 +20,6 @@ export default class HistoryStore extends StoreManager {
       currIndex: observable,
       prevItem: observable,
       videoHistory: observable,
-      reversedHistory: computed,
       checkItem: action,
       addItem: action,
       deleteItem: action,
@@ -32,11 +31,14 @@ export default class HistoryStore extends StoreManager {
     this.videoHistory ??= [];
     this.length = this.videoHistory.length;
   }
+  get showPrevRecord() {
+    return Boolean(this.prevItem && this.currIndex > -1);
+  }
   get reversedHistory() {
     if (!this.videoHistory) return [];
     const arr = this.videoHistory.slice();
     // remove curr item from arr, cuz it's always on top
-    if (this.prevItem && this.currIndex > -1) {
+    if (this.showPrevRecord) {
       arr.splice(this.currIndex, 1);
     }
     return arr.sort((a, b) => b.updatedAt - a.updatedAt);

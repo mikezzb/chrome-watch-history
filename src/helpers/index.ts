@@ -53,11 +53,12 @@ export const getMMMDDYY = (timestamp: string | number) => {
   }`;
 };
 
-const isPopup = (url: string) => url.startsWith("chrome-extension://");
+export const getWindowUrl = () => window.location.toString();
 
 export const safeGetUrl = async () => {
-  let url = window.location.toString();
-  if (isPopup(url)) {
+  const hasTabs = Boolean(chrome.tabs);
+  if (hasTabs) {
     return await getCurrUrl();
-  } else return url;
+  }
+  return getWindowUrl();
 };
