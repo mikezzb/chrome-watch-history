@@ -13,6 +13,7 @@ import {
 } from "react-icons/md";
 import Button from "./components/Button";
 import IconButton from "./components/IconButton";
+import { broadcastAll } from "./helpers/message";
 
 type VideoListItemProp = {
   item: VideoHistoryItem;
@@ -95,17 +96,15 @@ const Popup: FC = observer(() => {
     history.checkItem(await getCurrUrl());
   };
 
-  const onDelete = (url: string) => {
+  const onDelete = async (url: string) => {
     // pause update -> delete -> sync content script history
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(
-        tabs[0].id as number,
-        { type: "PAUSE" },
-        async () => {
-          await history.deleteItem(url);
-          chrome.tabs.sendMessage(tabs[0].id as number, { type: "SYNC" });
-        }
-      );
+    await broadcastAll({
+      type: "PAUSE",
+    });
+    await history.deleteItem(url);
+    history.checkItem(await getCurrUrl()); // update curr index
+    await broadcastAll({
+      type: "SYNC",
     });
   };
 
