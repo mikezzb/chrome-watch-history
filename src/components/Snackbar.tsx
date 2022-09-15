@@ -16,6 +16,8 @@ type Prop = {
 
 const Bar = styled.div`
   position: fixed;
+  display: flex;
+  align-items: center;
   z-index: 2000;
   bottom: 30px;
   margin-left: auto;
@@ -24,9 +26,11 @@ const Bar = styled.div`
   right: 2.5%;
   left: 2.5%;
   align-items: center;
-  background-color: white;
+  background-color: #121212;
+  color: white;
   padding: 12px;
   border-radius: 4px;
+  font-size: 14px;
 `;
 
 const SnackbarBtn = styled(Button)`
