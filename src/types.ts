@@ -19,7 +19,7 @@ interface VideoHistoryItemInfo extends VideoHistoryItem {
   name: string;
 }
 
-type MsgType = "JUMP";
+type MsgType = "JUMP" | "SYNC" | "PAUSE";
 
 type CustomRequest = {
   type: MsgType;

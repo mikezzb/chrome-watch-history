@@ -7,6 +7,7 @@ import StoreProvider, { useHistory } from "./core";
 import { videoManager } from "./core/VideoManager";
 import { safeGetUrl, toMMSS } from "./helpers";
 
+/** Monitor dom update & find video node */
 const domObserver = new MutationObserver((mutations) => {
   requestIdleCallback(
     async () => {
@@ -27,6 +28,24 @@ domObserver.observe(document, {
   childList: true,
   subtree: true,
 });
+
+/** Monitor popup events */
+chrome.runtime.onMessage.addListener(
+  (request: CustomRequest, sender, sendResponse) => {
+    switch (request.type) {
+      case "JUMP":
+        const { time } = request.data;
+        videoManager.jumpTo(time);
+        break;
+      case "SYNC":
+        videoManager.sync();
+        break;
+      case "PAUSE":
+        videoManager.pause();
+        break;
+    }
+  }
+);
 
 const JumpSnackbar: FC = observer(() => {
   const [msg, setMsg] = useState<any>();

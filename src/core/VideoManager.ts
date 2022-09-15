@@ -6,6 +6,11 @@ import ConfigStore, { configStore } from "./ConfigStore";
 
 // update store only ready
 
+enum VideoManagerState {
+  READY,
+  PAUSE,
+}
+
 export class VideoManager {
   private itemIndex!: number;
   private store!: HistoryStore;
@@ -16,6 +21,7 @@ export class VideoManager {
   private source?: HTMLSourceElement;
   private jumpTimeout?: NodeJS.Timeout; // allow time for user to jump b4 override hist if have prevItem
   private config: ConfigStore;
+  private state: VideoManagerState = VideoManagerState.READY;
   constructor(store: HistoryStore, config: ConfigStore) {
     this.store = store;
     this.config = config;
@@ -71,13 +77,14 @@ export class VideoManager {
     // if same url, then skip checking if got video already, otherwise keep checking
     if (url === this.url) {
       if (this.video) return;
+      console.log("same url check");
     }
     // if swapped url, then clear and check
     else if (this.url !== undefined) {
       this.clearVideo();
-      // console.log("diff url check");
+      console.log("diff url check");
     } else {
-      // console.log(`Check init url: ${url}`);
+      console.log(`Check init url: ${url}`);
     }
     this.url = url;
     if (!this.video) return;
@@ -85,7 +92,13 @@ export class VideoManager {
     this.observeVideo();
   }
   _onTimeUpdate(event: Event) {
-    if (!this.validRecord || this.jumpTimeout) return;
+    console.log(this.state);
+    if (
+      !this.validRecord ||
+      this.jumpTimeout ||
+      this.state === VideoManagerState.PAUSE
+    )
+      return;
     // lazy append history only if valid record
     if (this.itemIndex === -1) {
       const lazy = this.lazyMount();
@@ -127,6 +140,24 @@ export class VideoManager {
   jumpTo(time: number) {
     if (!this.video) return;
     this.video.currentTime = time;
+  }
+  pause() {
+    console.log("pause");
+    this.state = VideoManagerState.PAUSE;
+  }
+  resume() {
+    console.log("resume");
+    this.state = VideoManagerState.READY;
+  }
+  async sync() {
+    console.log("sync");
+    this.pause();
+    console.log(this.store.videoHistory);
+    await this.store.init();
+    this.itemIndex = this.store.addItem(this.url as string); // reassign index
+    console.log(this.store.videoHistory);
+    console.log(this.itemIndex);
+    this.resume();
   }
 }
 

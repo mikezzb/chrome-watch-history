@@ -95,7 +95,19 @@ const Popup: FC = observer(() => {
     history.checkItem(await getCurrUrl());
   };
 
-  const onDelete = (url: string) => history.deleteItem(url);
+  const onDelete = (url: string) => {
+    // pause update -> delete -> sync content script history
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(
+        tabs[0].id as number,
+        { type: "PAUSE" },
+        async () => {
+          await history.deleteItem(url);
+          chrome.tabs.sendMessage(tabs[0].id as number, { type: "SYNC" });
+        }
+      );
+    });
+  };
 
   return (
     <div className="cvh-list-container cvh-flex cvh-column">

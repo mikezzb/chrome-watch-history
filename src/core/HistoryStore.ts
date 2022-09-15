@@ -9,6 +9,7 @@ export default class HistoryStore extends StoreManager {
   videoHistory: VideoHistoryItem[] = [];
   length: number = 0;
   currIndex: number = -1;
+  currUrl: string = "";
   prevItem?: VideoHistoryItem = undefined;
   private config: ConfigStore;
   constructor(config: ConfigStore) {
@@ -23,6 +24,7 @@ export default class HistoryStore extends StoreManager {
       checkItem: action,
       addItem: action,
       deleteItem: action,
+      setCurrItem: action,
     });
   }
   async init() {
@@ -38,6 +40,10 @@ export default class HistoryStore extends StoreManager {
       arr.splice(this.currIndex, 1);
     }
     return arr.sort((a, b) => b.updatedAt - a.updatedAt);
+  }
+  setCurrItem(idx: number, url: string) {
+    this.currIndex = idx;
+    this.currUrl = url;
   }
   shiftLength(delta: number) {
     let length = this.length + delta;
@@ -60,7 +66,7 @@ export default class HistoryStore extends StoreManager {
     let idx = this.findItemIndex(url);
     if (idx !== null) {
       this.prevItem = this.videoHistory[idx];
-      this.currIndex = idx;
+      this.setCurrItem(idx, url);
     }
   }
   addItem(url: string, item?: VideoHistoryItemBase): number {
@@ -74,7 +80,7 @@ export default class HistoryStore extends StoreManager {
       this.prevItem = this.videoHistory[idx];
       console.log("prev record: ", JSON.stringify(this.prevItem));
     }
-    this.currIndex = idx;
+    this.setCurrItem(idx, url);
     return idx;
   }
   async deleteItem(url: string) {
@@ -84,17 +90,18 @@ export default class HistoryStore extends StoreManager {
     arr.splice(idx, 1);
     this.videoHistory = arr;
     this.shiftLength(-1);
-    this.saveHistory();
+    await this.saveHistory();
   }
   initItem(item: VideoHistoryItemBase) {
     this.videoHistory.push(item as any);
     const index = this.shiftLength(1) - 1;
     return index;
   }
-  saveHistory() {
-    this.save("videoHistory", toJS(this.videoHistory));
+  async saveHistory() {
+    await this.save("videoHistory", toJS(this.videoHistory));
   }
   updateItem(itemIndex: number, delta: Partial<VideoHistoryItem>) {
+    if (itemIndex === -1) return;
     delta.updatedAt = +new Date();
     console.log(`update ${itemIndex}: ${JSON.stringify(delta)}`);
     Object.assign(this.videoHistory[itemIndex], delta);
