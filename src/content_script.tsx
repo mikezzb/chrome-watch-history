@@ -83,7 +83,7 @@ const JumpSnackbar: FC = observer(() => {
             },
           },
         });
-        setTimeout(() => setMsg(null), 400000);
+        setTimeout(() => setMsg(null), 4000);
       },
       {
         fireImmediately: true,
