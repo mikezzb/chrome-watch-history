@@ -2,7 +2,7 @@
   "manifest_version": 3,
 
   "name": "Chrome Watch History",
-  "description": "Track your video playback history in Chrome",
+  "description": "Keep your chrome video watching history, and jump to your last watched time.",
   "version": "1.0",
 
   "options_ui": {
