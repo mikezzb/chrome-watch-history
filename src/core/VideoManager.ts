@@ -78,15 +78,15 @@ export class VideoManager {
       this._video = undefined;
       this.url = url;
     }
-    if (!this.video) return;
+    if (!this.video) return; // check video here, if has video then observe it
     // eventlistener for playback and update item history
     this.observeVideo();
   }
   async _onTimeUpdate(event: Event) {
     if (
-      !this.validRecord ||
+      this.state === VideoManagerState.PAUSE ||
       this.jumpTimeout ||
-      this.state === VideoManagerState.PAUSE
+      !this.validRecord
     )
       return;
     // lazy append history only if valid record
@@ -138,7 +138,9 @@ export class VideoManager {
   async sync() {
     this.pause();
     await this.store.init();
-    this.itemIndex = this.store.addItem(this.url as string); // reassign index
+    if (this.validRecord) {
+      this.itemIndex = this.store.addItem(this.url as string); // reassign index
+    }
     this.resume();
   }
 }
