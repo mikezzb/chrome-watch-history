@@ -3,7 +3,7 @@
 
   "name": "Chrome Watch History",
   "description": "Keep your chrome video watching history, and jump to your last watched time.",
-  "version": "1.0",
+  "version": "1.0.1",
 
   "options_ui": {
     "page": "options.html",
