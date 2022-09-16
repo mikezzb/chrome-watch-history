@@ -9,10 +9,10 @@ const LOAD_KEYS = [
 ];
 
 const DEFAULT_VALUES = {
-  maxRecords: 30,
+  maxRecords: 18, // for Error: QUOTA_BYTES_PER_ITEM quota exceeded
   syncInterval: 3000,
   recordThreshold: 300, // in seconds = 5 mins, to ignore preview / commercial video
-  overwriteTimeout: 10000,
+  overwriteTimeout: 6000,
 };
 
 export default class ConfigStore extends StoreManager {
