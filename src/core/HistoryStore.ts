@@ -69,6 +69,8 @@ export default class HistoryStore extends StoreManager {
     if (idx !== null) {
       this.prevItem = this.videoHistory[idx];
       this.setCurrItem(idx, url);
+    } else {
+      this.prevItem = undefined;
     }
   }
   addItem(url: string, item?: VideoHistoryItemBase): number {

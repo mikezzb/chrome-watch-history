@@ -4,10 +4,7 @@ import StoreProvider, { useHistory } from "./core";
 import { observer } from "mobx-react-lite";
 import { getCurrUrl, getMMMDDYY, toMMSS } from "./helpers";
 import clsx from "clsx";
-import {
-  MdDeleteOutline,
-  MdOpenInNew,
-} from "react-icons/md";
+import { MdDeleteOutline, MdOpenInNew } from "react-icons/md";
 import IconButton from "./components/IconButton";
 import { broadcastAll } from "./helpers/message";
 
@@ -36,12 +33,14 @@ type VideoListItemProp = {
   item: VideoHistoryItem;
   className?: string;
   onDelete?: (url: string) => any;
+  hideLink?: boolean;
 };
 
 const VideoListItem: FC<VideoListItemProp> = ({
   item,
   className,
   onDelete,
+  hideLink,
 }) => {
   const info = derive(item);
   const jumpToItem = () => {
@@ -61,9 +60,11 @@ const VideoListItem: FC<VideoListItemProp> = ({
             <MdDeleteOutline />
           </IconButton>
         )}
-        <IconButton onClick={jumpToItem}>
-          <MdOpenInNew />
-        </IconButton>
+        {!hideLink && (
+          <IconButton onClick={jumpToItem}>
+            <MdOpenInNew />
+          </IconButton>
+        )}
       </div>
     </div>
   );
@@ -98,7 +99,7 @@ const Popup: FC = observer(() => {
   return (
     <div className="cvh-list-container cvh-flex cvh-column">
       {Boolean(history.prevItem) && (
-        <VideoListItem className="active" item={history.prevItem as any} />
+        <VideoListItem hideLink item={history.prevItem as any} />
       )}
       {(hideId
         ? history.reversedHistory.filter((item) => item.url !== hideId)
