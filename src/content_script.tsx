@@ -5,7 +5,7 @@ import { observer } from "mobx-react-lite";
 import Snackbar from "./components/Snackbar";
 import StoreProvider, { useHistory } from "./core";
 import { videoManager } from "./core/VideoManager";
-import { getWindowUrl, toMMSS } from "./helpers";
+import { getWindowUrl, toMMSS, wait } from "./helpers";
 import { log } from "./helpers/logger";
 
 /** Monitor dom update & find video node */
@@ -14,10 +14,11 @@ const domObserver = new MutationObserver((mutations) => {
     async () => {
       mutations.forEach(async (mutation) => {
         if (mutation.type === "childList") {
-          mutation.addedNodes.forEach((node) => {
+          mutation.addedNodes.forEach(async (node) => {
             if (typeof node === "function") return;
             if (node.nodeName === "VIDEO") {
               log("added video node");
+              await wait(100);
               videoManager.checkVideo(getWindowUrl());
             }
           });
@@ -25,6 +26,7 @@ const domObserver = new MutationObserver((mutations) => {
         }
         if (mutation.type === "attributes") {
           log("src / currentSrc change");
+          await wait(100);
           videoManager.checkVideo(getWindowUrl());
         }
       });

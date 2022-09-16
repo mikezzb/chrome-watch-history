@@ -47,3 +47,6 @@ export const safeGetUrl = async () => {
   }
   return getWindowUrl();
 };
+
+export const wait = async (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
