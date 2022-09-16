@@ -8,6 +8,7 @@
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended"
   ],
+  "ignorePatterns": ["*.js"],
   "overrides": [],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
