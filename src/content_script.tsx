@@ -6,13 +6,25 @@ import Snackbar from "./components/Snackbar";
 import StoreProvider, { useHistory } from "./core";
 import { videoManager } from "./core/VideoManager";
 import { getWindowUrl, toMMSS } from "./helpers";
+import { log } from "./helpers/logger";
 
 /** Monitor dom update & find video node */
 const domObserver = new MutationObserver((mutations) => {
   requestIdleCallback(
-    () => {
+    async () => {
       mutations.forEach(async (mutation) => {
         if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
+            if (typeof node === "function") return;
+            if (node.nodeName === "VIDEO") {
+              log("added video node");
+              videoManager.checkVideo(getWindowUrl());
+            }
+          });
+          return;
+        }
+        if (mutation.type === "attributes") {
+          log("src / currentSrc change");
           videoManager.checkVideo(getWindowUrl());
         }
       });
@@ -24,7 +36,7 @@ const domObserver = new MutationObserver((mutations) => {
 });
 
 domObserver.observe(document, {
-  attributeFilter: ["aria-hidden"],
+  attributeFilter: ["src", "currentSrc"], // observe video attr change
   childList: true,
   subtree: true,
 });
