@@ -9,7 +9,7 @@ const LOAD_KEYS = [
 ];
 
 const DEFAULT_VALUES = {
-  maxRecords: 18, // for Error: QUOTA_BYTES_PER_ITEM quota exceeded
+  maxRecords: 10, // for Error: QUOTA_BYTES_PER_ITEM quota exceeded
   syncInterval: 3000,
   recordThreshold: 300, // in seconds = 5 mins, to ignore preview / commercial video
   overwriteTimeout: 6000,
