@@ -35,7 +35,7 @@ export const storeFactory = (
 
 const { getItem, setItem, removeItem, setItems, getItems } = storeFactory(
   chrome.storage,
-  "sync"
+  "local"
 );
 
 export { getItem, setItem, removeItem, setItems, getItems };
