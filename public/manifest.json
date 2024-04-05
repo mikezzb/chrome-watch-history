@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
 
-  "name": "Chrome Watch History",
-  "description": "Keep your chrome video watching history, and jump to your last watched time.",
+  "name": "Video Recall: One-Click Video Resume",
+  "description": "Instantly resume any previously watched video with just one click, regardless of the website.",
   "version": "1.0.6",
 
   "options_ui": {
